@@ -64,7 +64,7 @@ describe('OrderWidget', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://dev-storage-api.wr.io/test-org/processes/test-process/index.jsonld'
+        'https://dev-storage-api.wr.io/test-org/projects/main/processes/test-process/index.jsonld'
       );
     });
 
@@ -185,7 +185,8 @@ describe('OrderWidget', () => {
         'https://dev-workflows-api.wr.io/api/v1/payments/create-intent',
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('"projectId":"main"')
         })
       );
     });

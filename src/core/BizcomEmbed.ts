@@ -33,6 +33,7 @@ export abstract class BizcomEmbed extends HTMLElement {
    * Lifecycle: component connected to DOM
    */
   connectedCallback() {
+    this.processConfig = this.parseAttributes();
     this.render();
     this.attachEventListeners();
   }

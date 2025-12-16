@@ -11,6 +11,7 @@ The `<bizcom-order>` web component provides an embeddable order form with integr
 | Attribute | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `org` | string | Yes | Organization identifier (e.g., "demo-pizza") |
+| `project` | string | No | Project identifier (default: "main") |
 | `process` | string | Yes | Process ID (e.g., "order") |
 | `theme` | "light" \| "dark" | No | UI theme (default: "light") |
 | `locale` | string | No | Locale code (default: "en") |
@@ -21,6 +22,7 @@ The `<bizcom-order>` web component provides an embeddable order form with integr
 <script src="https://bizcom.wr.io/sdk/v1/bizcom.js"></script>
 <bizcom-order 
   org="demo-pizza" 
+  project="main"
   process="order"
   theme="light">
 </bizcom-order>
@@ -46,7 +48,7 @@ The component uses **Shadow DOM** for encapsulation and **Light DOM** for Stripe
 ### 1. Menu Loading
 
 ```
-GET https://dev-storage-api.wr.io/{org}/processes/{process}/index.jsonld
+GET https://dev-storage-api.wr.io/{org}/projects/{project}/processes/{process}/index.jsonld
 
 Response:
 {
@@ -84,6 +86,7 @@ Request:
   ],
   "metadata": {
     "org": "demo-pizza",
+    "projectId": "main",
     "processId": "order"
   }
 }
@@ -120,7 +123,7 @@ Request:
 {
   "processId": "order",
   "instanceId": "99b3cbff-b044-4811-95c4-b9914936eaa3",
-  "projectId": "demo-pizza-orders",
+  "projectId": "main",
   "ownerIdentifier": "demo-pizza",
   "variables": {
     "items": [...],
