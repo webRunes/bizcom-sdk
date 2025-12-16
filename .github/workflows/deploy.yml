@@ -31,8 +31,15 @@ jobs:
       - name: Build Demo
         run: pnpm build:demo
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist-demo
-          branch: gh-pages
+      - name: Copy to docs folder
+        run: |
+          rm -rf docs
+          cp -r dist-demo docs
+          
+      - name: Commit and push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "chore: update demo build" || echo "No changes to commit"
+          git push
