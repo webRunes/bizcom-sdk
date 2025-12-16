@@ -248,7 +248,8 @@ test('SDK-E2E-001: Full order flow', async ({ page }) => {
 - [ ] Tier-based branding logic
 
 ### Phase 3 (Production)
-- [ ] Deployed to Cloudflare Pages
+- [x] Deployed to GitHub Pages (Demo)
+- [ ] Deployed to Cloudflare Pages (CDN)
 - [ ] CDN distribution (`https://bizcom.wr.io/sdk/v1/bizcom.js`)
 - [ ] 1 pilot customer (pizzeria) in production
 - [ ] Video demo recorded

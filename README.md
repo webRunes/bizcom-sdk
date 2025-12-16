@@ -47,7 +47,21 @@ pnpm build
 # Test
 pnpm test
 pnpm test:e2e
+pnpm test:e2e
 ```
+
+## Deployment
+
+The demo page is automatically deployed to GitHub Pages via GitHub Actions when pushing to `master`.
+
+- **Demo URL:** [https://webrunes.github.io/bizcom-sdk/](https://webrunes.github.io/bizcom-sdk/)
+- **Workflow:** `.github/workflows/deploy.yml`
+- **Build Output:** `dist-demo/` -> `docs/` (in `master` branch)
+
+To deploy manually:
+1. `pnpm build:demo`
+2. Commit the `docs` folder
+3. Push to `master`
 
 ## Architecture
 
