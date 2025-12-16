@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizCom SDK Demo</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f9fafb;
+    }
+    h1 {
+      text-align: center;
+      color: #111827;
+      margin-bottom: 40px;
+    }
+    .demo-section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    .demo-section h2 {
+      margin-top: 0;
+      color: #374151;
+    }
+    pre {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+    }
+  </style>
+  <script type="module" crossorigin src="/bizcom-sdk/assets/index-BTpSAITE.js"></script>
+</head>
+<body>
+  <h1>🚀 BizCom SDK Demo</h1>
+
+  <div class="demo-section">
+    <h2>Order Widget</h2>
+    <p>Example: Pizza ordering system</p>
+    
+    <!-- BizCom Order Component -->
+    <bizcom-order 
+      org="demo-pizza" 
+      process="order"
+      theme="light">
+    </bizcom-order>
+
+    <h3>Usage:</h3>
+    <pre><code>&lt;script src="https://bizcom.wr.io/sdk/v1/bizcom.js"&gt;&lt;/script&gt;
+&lt;bizcom-order 
+  org="demo-pizza" 
+  process="order"
+  theme="light"&gt;
+&lt;/bizcom-order&gt;</code></pre>
+  </div>
+
+  <div class="demo-section">
+    <h2>Configuration</h2>
+    <p>The widget automatically loads menu from Storage API:</p>
+    <pre><code>GET https://dev-storage-api.wr.io/demo-pizza/processes/order/index.jsonld
+
+Response:
+{
+  "@context": "https://schema.org",
+  "@type": "Process",
+  "name": "Pizza Order",
+  "menu": [
+    {
+      "id": "margherita",
+      "name": "Margherita",
+      "description": "Classic tomato and mozzarella",
+      "price": 12.99
+    },
+    {
+      "id": "pepperoni",
+      "name": "Pepperoni",
+      "description": "Spicy pepperoni and cheese",
+      "price": 14.99
+    }
+  ]
+}</code></pre>
+  </div>
+
+</body>
+</html>
