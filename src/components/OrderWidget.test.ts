@@ -20,6 +20,11 @@ const mockStripe = {
   Stripe: vi.fn(() => mockStripe)
 };
 
+// Register custom element for tests
+if (!customElements.get('bizcom-order')) {
+  customElements.define('bizcom-order', OrderWidget);
+}
+
 describe('OrderWidget', () => {
   let widget: OrderWidget;
 
@@ -48,7 +53,7 @@ describe('OrderWidget', () => {
   });
 
   afterEach(() => {
-    widget.remove();
+    widget?.remove();
   });
 
   describe('OW-001: Menu Loading', () => {
