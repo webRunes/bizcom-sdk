@@ -270,11 +270,11 @@ export class OrderWidget extends BizcomEmbed {
     const container = this.shadow.querySelector('.bizcom-order');
     if (!container) return;
 
-    // Создаем UI для оплаты
+    // Создаем UI для оплаты в Shadow DOM с slot для Stripe Element
     container.innerHTML = `
       <div class="payment-form">
         <h3>Payment Details</h3>
-        <div id="payment-element"></div>
+        <slot name="stripe-payment"></slot>
         <div style="margin-top: 16px; display: flex; gap: 8px;">
           <button id="pay-button" style="flex: 1;">Pay $${orderData.total.toFixed(2)}</button>
           <button id="cancel-button" style="flex: 1; background: #6b7280;">Cancel</button>
@@ -283,19 +283,35 @@ export class OrderWidget extends BizcomEmbed {
       </div>
     `;
 
+    // Создаем контейнер для Stripe в Light DOM
+    const lightDomContainer = document.createElement('div');
+    lightDomContainer.slot = 'stripe-payment';
+    lightDomContainer.id = 'payment-element-light';
+    lightDomContainer.style.cssText = 'min-height: 200px; margin: 16px 0;';
+    this.appendChild(lightDomContainer);
+
     // Инициализируем Stripe Elements
     console.log('[BizcomSDK] Initializing Stripe Elements with clientSecret:', clientSecret ? 'present' : 'missing');
-    const elements = stripe.elements({ clientSecret });
-    const paymentElement = elements.create('payment');
     
-    const mountPoint = this.shadow.getElementById('payment-element');
-    if (mountPoint) {
-      console.log('[BizcomSDK] Mounting payment element to:', mountPoint);
-      paymentElement.mount(mountPoint);
-    } else {
-      console.error('[BizcomSDK] Payment mount point not found!');
-      this.renderError('Payment system error: UI element missing');
+    if (!clientSecret) {
+      this.renderError('Payment initialization failed: Missing client secret');
+      return;
     }
+
+    const elements = stripe.elements({ 
+      clientSecret,
+      appearance: {
+        theme: this.processConfig.theme === 'dark' ? 'night' : 'stripe'
+      }
+    });
+    
+    const paymentElement = elements.create('payment', {
+      layout: 'tabs'
+    });
+    
+    // Монтируем в Light DOM (не в Shadow DOM!)
+    console.log('[BizcomSDK] Mounting payment element to Light DOM container');
+    paymentElement.mount(lightDomContainer);
 
     // Обработка оплаты
     const payButton = this.shadow.getElementById('pay-button');
@@ -319,6 +335,9 @@ export class OrderWidget extends BizcomEmbed {
           paymentIntentId
         });
 
+        // Очищаем Light DOM контейнер
+        lightDomContainer.remove();
+
         // Показываем успех
         this.showSuccess(result.instanceId);
 
@@ -335,6 +354,7 @@ export class OrderWidget extends BizcomEmbed {
 
     // Кнопка отмены
     this.shadow.getElementById('cancel-button')?.addEventListener('click', () => {
+      lightDomContainer.remove();
       this.renderMenu();
     });
   }
