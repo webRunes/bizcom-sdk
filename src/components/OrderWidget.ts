@@ -145,7 +145,7 @@ export class OrderWidget extends BizcomEmbed {
         <button id="checkout" disabled>Checkout</button>
       </div>
       <div class="branding">
-        <a href="https://wr.io" target="_blank">Powered by WR.IO</a>
+        <a href="https://wr.io" target="_blank">Powered by wr.io</a>
       </div>
     `;
 
@@ -214,7 +214,13 @@ export class OrderWidget extends BizcomEmbed {
   }
 
   private async handleCheckout(): Promise<void> {
+    const checkoutBtn = this.shadow.getElementById('checkout') as HTMLButtonElement;
+    if (!checkoutBtn) return;
+
     try {
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Processing...';
+
       const orderData = {
         items: Array.from(this.cart.entries()).map(([itemId, count]) => ({
           itemId,
@@ -224,14 +230,126 @@ export class OrderWidget extends BizcomEmbed {
         total: this.calculateTotal()
       };
 
-      const result = await this.startProcess(orderData);
-      console.log('Order started:', result.instanceId);
-      
-      // TODO: Redirect to payment or show confirmation
-      alert(`Order placed! Instance ID: ${result.instanceId}`);
+      // 1. Создаем Payment Intent
+      const paymentResponse = await fetch(`${this.config.apiUrl}/api/v1/payments/create-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: orderData.items,
+          metadata: {
+            org: this.processConfig.org,
+            processId: this.processConfig.processId
+          }
+        })
+      });
+
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to create payment intent');
+      }
+
+      const { clientSecret, paymentIntentId } = await paymentResponse.json();
+
+      // 2. Загружаем Stripe и показываем форму оплаты
+      const stripe = await this.loadStripe(this.config.stripePublishableKey);
+      await this.showPaymentForm(stripe, clientSecret, paymentIntentId, orderData);
+
     } catch (error) {
-      this.renderError('Failed to place order');
+      console.error('Checkout error:', error);
+      this.renderError(error instanceof Error ? error.message : 'Failed to process checkout');
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = 'Checkout';
     }
+  }
+
+  private async showPaymentForm(
+    stripe: any, 
+    clientSecret: string, 
+    paymentIntentId: string,
+    orderData: any
+  ): Promise<void> {
+    const container = this.shadow.querySelector('.bizcom-order');
+    if (!container) return;
+
+    // Создаем UI для оплаты
+    container.innerHTML = `
+      <div class="payment-form">
+        <h3>Payment Details</h3>
+        <div id="payment-element"></div>
+        <div style="margin-top: 16px; display: flex; gap: 8px;">
+          <button id="pay-button" style="flex: 1;">Pay $${orderData.total.toFixed(2)}</button>
+          <button id="cancel-button" style="flex: 1; background: #6b7280;">Cancel</button>
+        </div>
+        <div id="payment-message" class="error" style="display: none; margin-top: 16px;"></div>
+      </div>
+    `;
+
+    // Инициализируем Stripe Elements
+    const elements = stripe.elements({ clientSecret });
+    const paymentElement = elements.create('payment');
+    paymentElement.mount(this.shadow.getElementById('payment-element'));
+
+    // Обработка оплаты
+    const payButton = this.shadow.getElementById('pay-button');
+    payButton?.addEventListener('click', async () => {
+      try {
+        (payButton as HTMLButtonElement).disabled = true;
+        (payButton as HTMLButtonElement).textContent = 'Processing...';
+
+        const { error } = await stripe.confirmPayment({
+          elements,
+          redirect: 'if_required'
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // Оплата успешна — запускаем воркфлоу
+        const result = await this.startProcess({
+          ...orderData,
+          paymentIntentId
+        });
+
+        // Показываем успех
+        this.showSuccess(result.instanceId);
+
+      } catch (err) {
+        const messageEl = this.shadow.getElementById('payment-message');
+        if (messageEl) {
+          messageEl.textContent = err instanceof Error ? err.message : 'Payment failed';
+          messageEl.style.display = 'block';
+        }
+        (payButton as HTMLButtonElement).disabled = false;
+        (payButton as HTMLButtonElement).textContent = `Pay $${orderData.total.toFixed(2)}`;
+      }
+    });
+
+    // Кнопка отмены
+    this.shadow.getElementById('cancel-button')?.addEventListener('click', () => {
+      this.renderMenu();
+    });
+  }
+
+  private showSuccess(instanceId: string): void {
+    const container = this.shadow.querySelector('.bizcom-order');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+        <h2>Order Placed Successfully!</h2>
+        <p>Your order has been received and is being processed.</p>
+        <p style="color: #6b7280; font-size: 14px; margin-top: 16px;">
+          Instance ID: ${instanceId}
+        </p>
+        <button id="new-order" style="margin-top: 24px;">Place Another Order</button>
+      </div>
+    `;
+
+    this.shadow.getElementById('new-order')?.addEventListener('click', () => {
+      this.cart.clear();
+      this.renderMenu();
+    });
   }
 
   private calculateTotal(): number {

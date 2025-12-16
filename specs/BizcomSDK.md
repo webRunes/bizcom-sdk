@@ -21,7 +21,7 @@ BizCom SDK is a lightweight JavaScript library that enables embedding business p
 - Copy-paste `<script>` + `<bizcom-order>` tags
 - Menu loads from BizCom Storage API
 - Orders trigger BPMN process execution
-- "Powered by WR.IO" branding shown for free tier
+- "Powered by wr.io" branding shown for free tier
 
 ### US-2: Developer Customizes Theme
 **As a** developer  
@@ -166,7 +166,7 @@ Response:
 ## Pricing Integration
 
 ### Free Tier
-- **Branding**: `<div class="bizcom-branding">Powered by WR.IO</div>`
+- **Branding**: `<div class="bizcom-branding">Powered by wr.io</div>`
 - **Commission**: 2.5% on transactions
 - **Limit**: 100 process executions/month
 
@@ -183,7 +183,7 @@ private renderBranding(): string {
   if (tier === 'free') {
     return `
       <div class="bizcom-branding">
-        <a href="https://wr.io" target="_blank">Powered by WR.IO</a>
+        <a href="https://wr.io" target="_blank">Powered by wr.io</a>
       </div>
     `;
   }

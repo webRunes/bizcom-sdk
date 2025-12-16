@@ -67,7 +67,7 @@
 - [ ] **SDK-064**: Admin dashboard for commission tracking
 
 ### Branding Logic
-- [ ] **SDK-070**: "Powered by WR.IO" component
+- [ ] **SDK-070**: "Powered by wr.io" component
 - [ ] **SDK-071**: Conditional rendering based on tier
 - [ ] **SDK-072**: CSS class for hiding branding
 - [ ] **SDK-073**: Link to WR.IO homepage

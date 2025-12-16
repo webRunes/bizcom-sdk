@@ -75,20 +75,60 @@ export abstract class BizcomEmbed extends HTMLElement {
    */
   protected async startProcess(input: any): Promise<{ instanceId: string }> {
     const url = `${this.config.apiUrl}/api/v1/workflows/start`;
+    
+    // Генерация уникальных ID
+    const instanceId = crypto.randomUUID();
+    const projectId = `${this.processConfig.org}-orders`; // Mock project ID
+    
+    const payload = {
+      processId: this.processConfig.processId,
+      instanceId,
+      projectId,
+      ownerIdentifier: this.processConfig.org,
+      variables: input,
+      type: 'general'
+    };
+    
+    console.log('[BizcomSDK] Starting workflow with payload:', JSON.stringify(payload, null, 2));
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        org: this.processConfig.org,
-        processId: this.processConfig.processId,
-        input
-      })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to start process: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to start process: ${response.statusText}`);
     }
 
     return response.json();
+  }
+
+  /**
+   * Load Stripe.js dynamically
+   */
+  protected async loadStripe(publishableKey: string): Promise<any> {
+    // @ts-ignore - Stripe will be loaded globally
+    if (window.Stripe) {
+      // @ts-ignore
+      return window.Stripe(publishableKey);
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.onload = () => {
+        // @ts-ignore
+        if (window.Stripe) {
+          // @ts-ignore
+          resolve(window.Stripe(publishableKey));
+        } else {
+          reject(new Error('Stripe.js failed to load'));
+        }
+      };
+      script.onerror = () => reject(new Error('Failed to load Stripe.js'));
+      document.head.appendChild(script);
+    });
   }
 }
