@@ -238,6 +238,7 @@ export class OrderWidget extends BizcomEmbed {
           items: orderData.items,
           metadata: {
             org: this.processConfig.org,
+            projectId: this.processConfig.projectId,
             processId: this.processConfig.processId
           }
         })

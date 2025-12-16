@@ -22,6 +22,7 @@ export abstract class BizcomEmbed extends HTMLElement {
   protected parseAttributes(): ProcessConfig {
     return {
       org: this.getAttribute('org') || '',
+      projectId: this.getAttribute('project') || 'main',
       processId: this.getAttribute('process') || '',
       theme: (this.getAttribute('theme') as 'light' | 'dark') || 'light',
       locale: this.getAttribute('locale') || 'en'
@@ -62,7 +63,7 @@ export abstract class BizcomEmbed extends HTMLElement {
    * Load process configuration from Storage API
    */
   protected async loadProcessConfig(): Promise<any> {
-    const url = `${this.config.storageUrl}/${this.processConfig.org}/processes/${this.processConfig.processId}/index.jsonld`;
+    const url = `${this.config.storageUrl}/${this.processConfig.org}/projects/${this.processConfig.projectId}/processes/${this.processConfig.processId}/index.jsonld`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to load process config: ${response.statusText}`);
@@ -78,12 +79,11 @@ export abstract class BizcomEmbed extends HTMLElement {
     
     // Генерация уникальных ID
     const instanceId = crypto.randomUUID();
-    const projectId = `${this.processConfig.org}-orders`; // Mock project ID
     
     const payload = {
       processId: this.processConfig.processId,
       instanceId,
-      projectId,
+      projectId: this.processConfig.projectId,
       ownerIdentifier: this.processConfig.org,
       variables: input,
       type: 'general'

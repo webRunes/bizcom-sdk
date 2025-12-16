@@ -7,6 +7,7 @@ export interface BizcomConfig {
 
 export interface ProcessConfig {
   org: string;
+  projectId: string;
   processId: string;
   theme?: 'light' | 'dark';
   locale?: string;
