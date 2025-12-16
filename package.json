@@ -1,6 +1,6 @@
 {
   "name": "@wrio/bizcom-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "BizCom Embed SDK - Web components for business processes",
   "type": "module",
   "main": "./dist/bizcom.js",
