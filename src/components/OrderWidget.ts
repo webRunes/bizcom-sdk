@@ -284,9 +284,18 @@ export class OrderWidget extends BizcomEmbed {
     `;
 
     // Инициализируем Stripe Elements
+    console.log('[BizcomSDK] Initializing Stripe Elements with clientSecret:', clientSecret ? 'present' : 'missing');
     const elements = stripe.elements({ clientSecret });
     const paymentElement = elements.create('payment');
-    paymentElement.mount(this.shadow.getElementById('payment-element'));
+    
+    const mountPoint = this.shadow.getElementById('payment-element');
+    if (mountPoint) {
+      console.log('[BizcomSDK] Mounting payment element to:', mountPoint);
+      paymentElement.mount(mountPoint);
+    } else {
+      console.error('[BizcomSDK] Payment mount point not found!');
+      this.renderError('Payment system error: UI element missing');
+    }
 
     // Обработка оплаты
     const payButton = this.shadow.getElementById('pay-button');
