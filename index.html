@@ -51,6 +51,7 @@
     <!-- BizCom Order Component -->
     <bizcom-order 
       org="demo-pizza" 
+      project="main"
       process="order"
       theme="light">
     </bizcom-order>
@@ -59,6 +60,7 @@
     <pre><code>&lt;script src="https://bizcom.wr.io/sdk/v1/bizcom.js"&gt;&lt;/script&gt;
 &lt;bizcom-order 
   org="demo-pizza" 
+  project="main"
   process="order"
   theme="light"&gt;
 &lt;/bizcom-order&gt;</code></pre>
@@ -67,7 +69,7 @@
   <div class="demo-section">
     <h2>Configuration</h2>
     <p>The widget automatically loads menu from Storage API:</p>
-    <pre><code>GET https://dev-storage-api.wr.io/demo-pizza/processes/order/index.jsonld
+    <pre><code>GET https://dev-storage-api.wr.io/demo-pizza/projects/main/processes/order/index.jsonld
 
 Response:
 {
