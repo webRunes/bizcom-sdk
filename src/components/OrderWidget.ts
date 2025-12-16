@@ -122,7 +122,7 @@ export class OrderWidget extends BizcomEmbed {
     this.cart.clear();
   }
 
-  private async loadMenu(): void {
+  private async loadMenu(): Promise<void> {
     try {
       const processConfig = await this.loadProcessConfig();
       this.menuItems = processConfig.menu || [];
