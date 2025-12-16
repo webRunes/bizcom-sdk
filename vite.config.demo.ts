@@ -4,6 +4,11 @@ export default defineConfig({
   base: '/bizcom-sdk/',
   build: {
     outDir: 'dist-demo',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: 'index.html'
+      }
+    }
   }
 });
